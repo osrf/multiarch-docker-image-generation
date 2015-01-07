@@ -1,3 +1,3 @@
-Script to generate an Ubuntu 32bit Docker image.
+Script (derived from https://github.com/docker-32bit/ubuntu) to generate Ubuntu 32bit Docker images.
 
-A generated Docker image is available via [DockerHub](https://registry.hub.docker.com/u/osrf/ubuntu_32bit/).
+The generated Docker images are available via [DockerHub](https://registry.hub.docker.com/u/osrf/ubuntu_32bit/).

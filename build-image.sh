@@ -4,9 +4,9 @@
 ### settings
 arch=i386
 suite=trusty
-chroot_dir='/var/chroot/trusty'
+chroot_dir="/var/chroot/ubuntu_32bit_$suite"
 apt_mirror='http://archive.ubuntu.com/ubuntu'
-docker_image='osrf/ubuntu_32bit:trusty'
+docker_image="osrf/ubuntu_32bit:$suite"
 
 ### make sure that the required tools are installed
 apt-get install -y docker.io debootstrap dchroot
@@ -38,14 +38,14 @@ rm $chroot_dir/etc/resolv.conf
 umount $chroot_dir/proc
 
 ### create a tar archive from the chroot directory
-tar cfz ubuntu.tgz -C $chroot_dir .
+tar cfz ubuntu_32bit_$suite.tgz -C $chroot_dir .
 
 ### import this tar archive into a docker image:
-cat ubuntu.tgz | docker import - $docker_image
+cat ubuntu_32bit_$suite.tgz | docker import - $docker_image
 
 # ### push image to Docker Hub
 docker push $docker_image
 
 # ### cleanup
-rm ubuntu.tgz
+rm ubuntu_32bit_$suite.tgz
 rm -rf $chroot_dir
