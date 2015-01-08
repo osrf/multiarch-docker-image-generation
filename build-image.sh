@@ -24,11 +24,20 @@ deb http://security.ubuntu.com/ubuntu $suite-security main restricted universe m
 deb http://extras.ubuntu.com/ubuntu $suite main
 EOF
 
+# prevent init scripts from running during install/update
+#echo $'#!/bin/sh\nexit 101' | tee $chroot_dir/usr/sbin/policy-rc.d > /dev/null
+#chmod +x usr/sbin/policy-rc.d
+# see https://github.com/dotcloud/docker/issues/446#issuecomment-16953173
+
 ### install ubuntu-minimal
 cp /etc/resolv.conf $chroot_dir/etc/resolv.conf
 mount -o bind /proc $chroot_dir/proc
 chroot $chroot_dir apt-get update
 chroot $chroot_dir apt-get -y install ubuntu-minimal
+
+# https://github.com/docker/docker/issues/1024
+chroot $chroot_dir dpkg-divert --local --rename --add /sbin/initctl
+chroot $chroot_dir ln -s /bin/true /sbin/initctl
 
 ### cleanup and unmount /proc
 chroot $chroot_dir apt-get autoclean
@@ -36,6 +45,12 @@ chroot $chroot_dir apt-get clean
 chroot $chroot_dir apt-get autoremove
 rm $chroot_dir/etc/resolv.conf
 umount $chroot_dir/proc
+
+# while we're at it, apt is unnecessarily slow inside containers
+#  this forces dpkg not to call sync() after package extraction and speeds up install
+#echo 'force-unsafe-io' | tee $chroot_dir/etc/dpkg/dpkg.cfg.d/02apt-speedup > /dev/null
+#  we don't need an apt cache in a container
+#echo 'Acquire::http {No-Cache=True;};' | tee $chroot_dir/etc/apt/apt.conf.d/no-cache > /dev/null
 
 ### create a tar archive from the chroot directory
 tar cfz ubuntu_32bit_$suite.tgz -C $chroot_dir .
