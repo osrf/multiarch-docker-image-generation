@@ -21,8 +21,13 @@ deb $apt_mirror $suite main restricted universe multiverse
 deb $apt_mirror $suite-updates main restricted universe multiverse
 deb $apt_mirror $suite-backports main restricted universe multiverse
 deb http://security.ubuntu.com/ubuntu $suite-security main restricted universe multiverse
+EOF
+
+if [ "$suite" != "vivid" ]; then
+cat <<EOF >> $chroot_dir/etc/apt/sources.list
 deb http://extras.ubuntu.com/ubuntu $suite main
 EOF
+fi
 
 # prevent init scripts from running during install/update
 #echo $'#!/bin/sh\nexit 101' | tee $chroot_dir/usr/sbin/policy-rc.d > /dev/null
