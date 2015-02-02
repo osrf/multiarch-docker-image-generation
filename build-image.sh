@@ -29,10 +29,27 @@ deb http://extras.ubuntu.com/ubuntu $suite main
 EOF
 fi
 
+# a few minor docker-specific tweaks
+# see https://github.com/docker/docker/blob/master/contrib/mkimage/debootstrap
+
 # prevent init scripts from running during install/update
-#echo $'#!/bin/sh\nexit 101' | tee $chroot_dir/usr/sbin/policy-rc.d > /dev/null
-#chmod +x usr/sbin/policy-rc.d
-# see https://github.com/dotcloud/docker/issues/446#issuecomment-16953173
+echo '#!/bin/sh' > $chroot_dir/usr/sbin/policy-rc.d
+echo 'exit 101' >> $chroot_dir/usr/sbin/policy-rc.d
+chmod +x $chroot_dir/usr/sbin/policy-rc.d
+
+# force dpkg not to call sync() after package extraction (speeding up installs)
+echo 'force-unsafe-io' > $chroot_dir/etc/dpkg/dpkg.cfg.d/docker-apt-speedup
+
+# _keep_ us lean by effectively running "apt-get clean" after every install
+echo 'DPkg::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin || true"; };' > $chroot_dir/etc/apt/apt.conf.d/docker-clean
+echo 'APT::Update::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin || true"; };' >> $chroot_dir/etc/apt/apt.conf.d/docker-clean
+echo 'Dir::Cache::pkgcache ""; Dir::Cache::srcpkgcache "";' >> $chroot_dir/etc/apt/apt.conf.d/docker-clean
+
+# remove apt-cache translations for fast "apt-get update"
+echo 'Acquire::Languages "none";' > $chroot_dir/etc/apt/apt.conf.d/docker-no-languages
+
+# store Apt lists files gzipped on-disk for smaller size
+echo 'Acquire::GzipIndexes "true"; Acquire::CompressionTypes::Order:: "gz";' > $chroot_dir/etc/apt/apt.conf.d/docker-gzip-indexes
 
 ### install ubuntu-minimal
 cp /etc/resolv.conf $chroot_dir/etc/resolv.conf
@@ -50,12 +67,6 @@ chroot $chroot_dir apt-get clean
 chroot $chroot_dir apt-get autoremove
 rm $chroot_dir/etc/resolv.conf
 umount $chroot_dir/proc
-
-# while we're at it, apt is unnecessarily slow inside containers
-#  this forces dpkg not to call sync() after package extraction and speeds up install
-#echo 'force-unsafe-io' | tee $chroot_dir/etc/dpkg/dpkg.cfg.d/02apt-speedup > /dev/null
-#  we don't need an apt cache in a container
-#echo 'Acquire::http {No-Cache=True;};' | tee $chroot_dir/etc/apt/apt.conf.d/no-cache > /dev/null
 
 ### create a tar archive from the chroot directory
 tar cfz ubuntu_32bit_$suite.tgz -C $chroot_dir .
