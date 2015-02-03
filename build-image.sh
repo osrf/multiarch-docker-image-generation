@@ -1,6 +1,8 @@
 #!/bin/bash -x
 ### Build a docker image for ubuntu i386.
 
+set -e
+
 ### settings
 arch=i386
 suite=trusty
