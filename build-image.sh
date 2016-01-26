@@ -11,7 +11,7 @@ apt_mirror='http://archive.ubuntu.com/ubuntu'
 docker_image="osrf/ubuntu_32bit:$suite"
 
 ### make sure that the required tools are installed
-apt-get install -y docker.io debootstrap dchroot
+# apt-get install -y docker.io debootstrap dchroot
 
 ### install a minbase system with debootstrap
 export DEBIAN_FRONTEND=noninteractive
@@ -76,9 +76,9 @@ tar cfz ubuntu_32bit_$suite.tgz -C $chroot_dir .
 ### import this tar archive into a docker image:
 cat ubuntu_32bit_$suite.tgz | docker import - $docker_image
 
-# ### push image to Docker Hub
-docker push $docker_image
-
 # ### cleanup
 rm ubuntu_32bit_$suite.tgz
 rm -rf $chroot_dir
+
+### push image to Docker Hub
+echo "Test the image $docker_image and push it to upstream with 'docker push $docker_image'"
