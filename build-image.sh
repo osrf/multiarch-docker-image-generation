@@ -5,7 +5,7 @@ set -e
 
 ### settings
 arch=i386
-suite=trusty
+suite=wily
 chroot_dir="/var/chroot/ubuntu_32bit_$suite"
 apt_mirror='http://archive.ubuntu.com/ubuntu'
 docker_image="osrf/ubuntu_32bit:$suite"
@@ -25,11 +25,11 @@ deb $apt_mirror $suite-backports main restricted universe multiverse
 deb http://security.ubuntu.com/ubuntu $suite-security main restricted universe multiverse
 EOF
 
-if [ "$suite" != "vivid" ]; then
-cat <<EOF >> $chroot_dir/etc/apt/sources.list
-deb http://extras.ubuntu.com/ubuntu $suite main
-EOF
-fi
+# if [ "$suite" != "vivid" ]; then
+# cat <<EOF >> $chroot_dir/etc/apt/sources.list
+# deb http://extras.ubuntu.com/ubuntu $suite main
+# EOF
+# fi
 
 # a few minor docker-specific tweaks
 # see https://github.com/docker/docker/blob/master/contrib/mkimage/debootstrap
