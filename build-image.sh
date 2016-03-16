@@ -9,7 +9,7 @@ set -e
 
 ### settings
 os=debian
-arch=amd64
+arch=armhf
 suite=jessie
 chroot_dir="/var/chroot/${os}_${arch}_$suite"
 docker_image="osrf/${os}_$arch:$suite"
@@ -39,6 +39,8 @@ debootstrap $foreign_arg --variant=minbase --arch=$arch $suite $chroot_dir $apt_
 
 if [[ $foreign_arches =~ $arch ]]; then
   cp qemu-arm-static $chroot_dir/usr/bin/
+  LC_ALL=C LANGUAGE=C LANG=C chroot $chroot_dir /debootstrap/debootstrap --second-stage
+  LC_ALL=C LANGUAGE=C LANG=C chroot $chroot_dir dpkg --configure -a
 fi
 
 ### update the list of package sources
