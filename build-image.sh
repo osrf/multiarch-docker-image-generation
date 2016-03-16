@@ -9,9 +9,9 @@
 set -e
 
 ### settings
-os=ubuntu
-arch=armhf
-suite=xenial
+os=debian
+arch=arm64
+suite=jessie
 chroot_dir="/var/chroot/${os}_${arch}_$suite"
 docker_image="osrf/${os}_$arch:$suite"
 
@@ -39,7 +39,11 @@ fi
 debootstrap $foreign_arg --variant=minbase --arch=$arch $suite $chroot_dir $apt_mirror
 
 if [[ ${foreign_arches[*]} =~ $arch ]]; then
-  cp qemu-arm-static $chroot_dir/usr/bin/
+  if [ $arch == 'armhf' ]; then
+    cp qemu-arm-static $chroot_dir/usr/bin/
+  elif [ $arch == 'arm64' ]; then
+    cp qemu-aarch64-static $chroot_dir/usr/bin/
+  fi
   LC_ALL=C LANGUAGE=C LANG=C chroot $chroot_dir /debootstrap/debootstrap --second-stage
   LC_ALL=C LANGUAGE=C LANG=C chroot $chroot_dir dpkg --configure -a
 fi
