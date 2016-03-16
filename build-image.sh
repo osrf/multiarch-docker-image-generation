@@ -3,21 +3,22 @@
 
 # Sources:
 # https://wiki.debian.org/Debootstrap
-# https://wiki.debian.org/EmDebian/CrossDebootstrap 
+# https://wiki.debian.org/EmDebian/CrossDebootstrap
+# https://wiki.debian.org/Arm64Qemu
 
 set -e
 
 ### settings
-os=debian
+os=ubuntu
 arch=armhf
-suite=jessie
+suite=xenial
 chroot_dir="/var/chroot/${os}_${arch}_$suite"
 docker_image="osrf/${os}_$arch:$suite"
 
 foreign_arches=(armhf arm64)
 
 if [ $os == 'ubuntu' ]; then
-  if [[ $foreign_arches =~ $arch ]]; then
+  if [[ ${foreign_arches[*]} =~ $arch ]]; then
     apt_mirror='http://ports.ubuntu.com'
   else
     apt_mirror='http://archive.ubuntu.com/ubuntu'
@@ -32,12 +33,12 @@ fi
 ### install a minbase system with debootstrap
 export DEBIAN_FRONTEND=noninteractive
 foreign_arg=''
-if [[ $foreign_arches =~ $arch ]]; then
+if [[ ${foreign_arches[*]} =~ $arch ]]; then
   foreign_arg='--foreign'
 fi
 debootstrap $foreign_arg --variant=minbase --arch=$arch $suite $chroot_dir $apt_mirror
 
-if [[ $foreign_arches =~ $arch ]]; then
+if [[ ${foreign_arches[*]} =~ $arch ]]; then
   cp qemu-arm-static $chroot_dir/usr/bin/
   LC_ALL=C LANGUAGE=C LANG=C chroot $chroot_dir /debootstrap/debootstrap --second-stage
   LC_ALL=C LANGUAGE=C LANG=C chroot $chroot_dir dpkg --configure -a
@@ -46,16 +47,18 @@ fi
 ### update the list of package sources
 cat <<EOF > $chroot_dir/etc/apt/sources.list
 deb $apt_mirror $suite main restricted universe multiverse
-
 EOF
 
 if [ $os == 'ubuntu' ]; then
   cat <<EOF >> $chroot_dir/etc/apt/sources.list
 deb $apt_mirror $suite-updates main restricted universe multiverse
 deb $apt_mirror $suite-backports main restricted universe multiverse
+EOF
+  if [ ! [ ${foreign_arches[*]} =~ $arch ] ]; then
+    cat <<EOF >> $chroot_dir/etc/apt/sources.list
 deb http://security.ubuntu.com/ubuntu $suite-security main restricted universe multiverse
 EOF
-  
+  fi
 fi
 
 # if [ "$suite" != "vivid" ]; then
