@@ -47,16 +47,21 @@ if [[ ${foreign_arches[*]} =~ $arch ]]; then
   LC_ALL=C LANGUAGE=C LANG=C chroot $chroot_dir /debootstrap/debootstrap --second-stage
   LC_ALL=C LANGUAGE=C LANG=C chroot $chroot_dir dpkg --configure -a
 fi
+if [ $os == 'ubuntu' ]; then
+  repositories='main restricted universe multiverse'
+else
+  repositories='main non-free contrib'
+fi
 
 ### update the list of package sources
 cat <<EOF > $chroot_dir/etc/apt/sources.list
-deb $apt_mirror $suite main restricted universe multiverse
+deb $apt_mirror $suite $repositories
 EOF
 
 if [ $os == 'ubuntu' ]; then
   cat <<EOF >> $chroot_dir/etc/apt/sources.list
-deb $apt_mirror $suite-updates main restricted universe multiverse
-deb $apt_mirror $suite-backports main restricted universe multiverse
+deb $apt_mirror $suite-updates $repositories
+deb $apt_mirror $suite-backports $repositories
 EOF
   if [ ! [ ${foreign_arches[*]} =~ $arch ] ]; then
     cat <<EOF >> $chroot_dir/etc/apt/sources.list
