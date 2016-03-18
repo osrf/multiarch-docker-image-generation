@@ -9,9 +9,24 @@
 set -e
 
 ### settings
-os=debian
-arch=arm64
-suite=jessie
+if [ "$IMAGE_OS" ]; then
+  os=$IMAGE_OS
+else
+  os=ubuntu
+fi
+
+if [ "$IMAGE_ARCH" ]; then
+  arch=$IMAGE_ARCH
+else
+  arch=arm64
+fi
+
+if [ "$IMAGE_SUITE" ]; then
+  suite=$IMAGE_SUITE
+else
+  suite=xenial
+fi
+
 chroot_dir="/var/chroot/${os}_${arch}_$suite"
 docker_image="osrf/${os}_$arch:$suite"
 
