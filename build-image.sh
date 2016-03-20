@@ -36,7 +36,11 @@ if [ $os == 'ubuntu' ]; then
   if [[ ${foreign_arches[*]} =~ $arch ]]; then
     apt_mirror='http://ports.ubuntu.com'
   else
-    apt_mirror='http://archive.ubuntu.com/ubuntu'
+    if [ $suite == 'saucy' ] || [ $suite == 'utopic' ]; then
+      apt_mirror='http://old-releases.ubuntu.com/ubuntu'
+    else
+      apt_mirror='http://archive.ubuntu.com/ubuntu'
+    fi
   fi
 elif [ $os == 'debian' ]; then
   apt_mirror='http://httpredir.debian.org/debian'
