@@ -72,10 +72,15 @@ for (o, s, a) in get_supported_targets():
         continue
 
     verify_command = 'docker run %s uname -a' % image_name
-    output = subprocess.check_output(verify_command, env=env_override, shell=True, stderr=subprocess.STDOUT)
-    str_out = output.decode("utf-8")
-    if not arch_uname_mapping[a] in str_out:
-        print("Failed to get correct uname result for %s, aborting" % image_name)
+    try:
+        output = subprocess.check_output(verify_command, env=env_override, shell=True, stderr=subprocess.STDOUT)
+        str_out = output.decode("utf-8")
+        if not arch_uname_mapping[a] in str_out:
+            print("Failed to get correct uname result for %s, aborting" % image_name)
+            failed_builds.append(image_name)
+            continue
+    except subprocess.CalledProcessError as ex:
+        print("failed to test %s" % image_name)
         failed_builds.append(image_name)
         continue
     print("Successfully detected uname %s in %s" % (arch_uname_mapping[a], image_name))
