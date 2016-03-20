@@ -21,6 +21,10 @@ SUPPORTED_TARGETS = {
         'jessie': ['arm64', 'armhf']
     },
     'ubuntu': {
+        'saucy': ['i386'],
+        'trusty': ['i386'],
+        'utopic': ['i386'],
+        'vivid': ['i386'],
         'xenial': ALL_ARCHES,
         'wily': ALL_ARCHES,
     }
