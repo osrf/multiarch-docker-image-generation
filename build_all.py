@@ -22,7 +22,7 @@ SUPPORTED_TARGETS = {
     },
     'ubuntu': {
         'saucy': ['i386'],
-        'trusty': ['i386'],
+        'trusty': ['i386', 'armhf'],
         'utopic': ['i386'],
         'vivid': ['i386'],
         'xenial': ALL_ARCHES,
