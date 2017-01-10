@@ -18,7 +18,8 @@ arch_uname_mapping = {
 
 SUPPORTED_TARGETS = {
     'debian': {
-        'jessie': ['arm64', 'armhf']
+        'jessie': ['arm64', 'armhf'],
+        'stretch': ['arm64', 'armhf'],
     },
     'ubuntu': {
         'saucy': ['i386'],
@@ -27,6 +28,8 @@ SUPPORTED_TARGETS = {
         'vivid': ['i386'],
         'xenial': ALL_ARCHES,
         'wily': ALL_ARCHES,
+        'yakkety': ALL_ARCHES,
+        'zesty': ALL_ARCHES,
     }
 }
 
