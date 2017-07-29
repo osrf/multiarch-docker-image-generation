@@ -113,7 +113,7 @@ for (o, s, a) in get_supported_targets():
     try:
         subprocess.check_call(cmd, env=env_override, shell=True, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as ex:
-        print("failed to process %s" % image_name)
+        print("failed to process %s: %s" % (image_name, ex))
         failed_builds.append(image_name)
         continue
 
