@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 
 import argparse
+import errno
+import os
 import subprocess
+
+from datetime import date
 
 ALL_ARCHES = [
     # 'amd64', Use the standard images from docker
@@ -42,18 +46,53 @@ def get_supported_targets():
                 yield (os_name, suite_name, arch)
 
 
+def construct_image_name(operating_system, arch, suite):
+    return "osrf/%s_%s:%s" % (operating_system, arch, suite)
+
+
+def image_save_name_encode(image_name):
+    image_name = image_name.replace('/', '__')
+    image_name = image_name.replace(':', '__')
+    return image_name + '-' + date.today().isoformat()
+
+
+def backup_image(image_name, directory):
+    try:
+        os.makedirs(directory)
+    except OSError as ex:
+        if ex.errno == errno.EEXIST and os.path.isdir(directory):
+            pass
+        else:
+            raise
+
+    image_filename = image_save_name_encode(image_name)
+    print("Pulling %s for backup" % image_name)
+    pull_command = 'docker pull %s' % (image_name)
+    subprocess.check_output(pull_command, shell=True, stderr=subprocess.STDOUT)
+
+    backup_command = 'docker save %s -o %s/%s.tar' % (image_name, directory, image_filename)
+    print("Saving image %s with command [%s]" % (image_name, backup_command))
+    subprocess.check_output(backup_command, shell=True, stderr=subprocess.STDOUT)
+
+
 parser = argparse.ArgumentParser()
 parser.add_argument("--os",
     help="Filter results to a specific OS such as 'ubuntu' or 'debian'")
 parser.add_argument("--suite",
     help="Filter results to a specific suite such as 'xenial' or 'jessie'")
 parser.add_argument("--arch", help="Filter results to a specific architecture such as 'arm64' or 'armhf'")
+parser.add_argument("--backup", help="Backup the previous images to this directory.")
 args = parser.parse_args()
+
+if args.backup:
+    for (o, s, a) in get_supported_targets():
+        image_name = construct_image_name(o, a, s)
+        backup_image(image_name, args.backup)
 
 successful_builds = []
 failed_builds = []
 for (o, s, a) in get_supported_targets():
-    image_name = "osrf/%s_%s:%s" % (o, a, s)
+    image_name = construct_image_name(o, a, s)
     if args.os and args.os != o:
         print("%s does not match os argument %s" % (image_name, args.os))
         continue
@@ -74,7 +113,7 @@ for (o, s, a) in get_supported_targets():
     try:
         subprocess.check_call(cmd, env=env_override, shell=True, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as ex:
-        print("failed to process %s" % image_name)
+        print("failed to process %s: %s" % (image_name, ex))
         failed_builds.append(image_name)
         continue
 

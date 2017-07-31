@@ -49,6 +49,13 @@ fi
 ### make sure that the required tools are installed
 # apt-get install -y docker.io debootstrap dchroot
 
+
+### Clear chroot_dir to make sure the rebuild is clean
+# This is tp prevent a corrupted chroot dir to break repeated failed
+# rebuilds that have been observed at the deboostrap minbase stage
+echo Clear chroot before debootstrap
+rm -rf $chroot_dir
+
 ### install a minbase system with debootstrap
 export DEBIAN_FRONTEND=noninteractive
 foreign_arg=''
