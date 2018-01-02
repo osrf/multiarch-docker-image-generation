@@ -34,6 +34,8 @@ SUPPORTED_TARGETS = {
         'wily': ALL_ARCHES,
         'yakkety': ALL_ARCHES,
         'zesty': ALL_ARCHES,
+        'artful': ALL_ARCHES,
+        'bionic': ALL_ARCHES,
     }
 }
 
