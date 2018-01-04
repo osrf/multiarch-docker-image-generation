@@ -36,7 +36,7 @@ if [ $os == 'ubuntu' ]; then
   if [[ ${foreign_arches[*]} =~ $arch ]]; then
     apt_mirror='http://ports.ubuntu.com'
   else
-    if [ $suite == 'saucy' ] || [ $suite == 'utopic' ]; then
+    if [ $suite == 'saucy' ] || [ $suite == 'utopic' ] || [ $suite == 'vivid' ] || [ $suite == 'wily' ]; then
       apt_mirror='http://old-releases.ubuntu.com/ubuntu'
     else
       apt_mirror='http://archive.ubuntu.com/ubuntu'
