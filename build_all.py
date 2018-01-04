@@ -67,14 +67,24 @@ def backup_image(image_name, directory):
         else:
             raise
 
-    image_filename = image_save_name_encode(image_name)
-    print("Pulling %s for backup" % image_name)
-    pull_command = 'docker pull %s' % (image_name)
-    subprocess.check_output(pull_command, shell=True, stderr=subprocess.STDOUT)
+    image_filename = os.path.join(directory,
+        image_save_name_encode(image_name) + '.tar')
+    if os.path.exists(image_filename):
+        print("Backup %s already exists; skipping." % image_filename)
+        return True
+    try:
+        print("Pulling %s for backup" % image_name)
+        pull_command = 'docker pull %s' % (image_name)
+        subprocess.check_output(pull_command, shell=True, stderr=subprocess.STDOUT)
 
-    backup_command = 'docker save %s -o %s/%s.tar' % (image_name, directory, image_filename)
-    print("Saving image %s with command [%s]" % (image_name, backup_command))
-    subprocess.check_output(backup_command, shell=True, stderr=subprocess.STDOUT)
+        backup_command = 'docker save %s -o %s' % (image_name, image_filename)
+        print("Saving image %s with command [%s]" % (image_name, backup_command))
+        subprocess.check_output(backup_command, shell=True, stderr=subprocess.STDOUT)
+        return True
+    except subprocess.CalledProcessError as ex:
+        print("Failed to backup %s to %s: %s\nContinuing..." %
+              (image_name, image_filename, ex))
+        return False
 
 
 parser = argparse.ArgumentParser()
@@ -86,10 +96,13 @@ parser.add_argument("--arch", help="Filter results to a specific architecture su
 parser.add_argument("--backup", help="Backup the previous images to this directory.")
 args = parser.parse_args()
 
+failed_backups = []
 if args.backup:
     for (o, s, a) in get_supported_targets():
         image_name = construct_image_name(o, a, s)
-        backup_image(image_name, args.backup)
+        backup_success = backup_image(image_name, args.backup)
+        if not backup_success:
+            failed_backups.append(image_name)
 
 successful_builds = []
 failed_builds = []
@@ -135,7 +148,10 @@ for (o, s, a) in get_supported_targets():
     successful_builds.append(image_name)
 
 print("Summary:")
-print("Failed to build:\n%s" % failed_builds)
+if failed_builds:
+    print("Failed to build:\n%s" % failed_builds)
+if failed_backups:
+    print("Failed to backup:\n%s" % failed_backups)
 
 print("Successfully built the following images.")
 print("%s " % successful_builds)
