@@ -26,14 +26,8 @@ SUPPORTED_TARGETS = {
         'stretch': ['arm64', 'armhf'],
     },
     'ubuntu': {
-        'saucy': ['i386'],
         'trusty': ['i386', 'armhf'],
-        'utopic': ['i386'],
-        'vivid': ['i386'],
         'xenial': ALL_ARCHES,
-        'wily': ALL_ARCHES,
-        'yakkety': ALL_ARCHES,
-        'zesty': ALL_ARCHES,
         'artful': ALL_ARCHES,
         'bionic': ALL_ARCHES,
     }
