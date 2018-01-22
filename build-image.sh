@@ -33,7 +33,7 @@ docker_image="osrf/${os}_$arch:$suite"
 foreign_arches=(armhf arm64)
 
 if [ $os == 'ubuntu' ]; then
-  if [ $suite == 'saucy' ] || [ $suite == 'utopic' ] || [ $suite == 'vivid' ] || [ $suite == 'wily' ]; then
+  if [ $suite == 'saucy' ] || [ $suite == 'utopic' ] || [ $suite == 'vivid' ] || [ $suite == 'wily' || [ $suite == 'yakkety' || [ $suite == 'zesty' ]; then
     apt_mirror='http://old-releases.ubuntu.com/ubuntu'
   elif [[ ${foreign_arches[*]} =~ $arch ]]; then
     apt_mirror='http://ports.ubuntu.com'
