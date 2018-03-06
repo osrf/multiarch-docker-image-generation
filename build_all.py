@@ -28,7 +28,7 @@ SUPPORTED_TARGETS = {
     'ubuntu': {
         'trusty': ['i386', 'armhf'],
         'xenial': ALL_ARCHES,
-        'artful': ALL_ARCHES,
+        'artful': ['i386'],
         'bionic': ALL_ARCHES,
     }
 }
