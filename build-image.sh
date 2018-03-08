@@ -72,7 +72,7 @@ if [[ ${foreign_arches[*]} =~ $arch ]]; then
   # Workaround for https://github.com/osrf/multiarch-docker-image-generation/issues/18
   # This is very hairy because bash's config scripts are all in bash and
   # dpkg doesn't seem able to override the exist status of a prerm script.
-  if [ $suite == 'bionic' -a $arch == 'arm64' ]; then
+  if [ $suite == 'bionic' -a \( $arch == 'arm64' -o $arch == 'armhf' \) ]; then
     _bash_pkg="bash_4.4.18-1ubuntu1osrf1_${arch}.deb"
     cp $_bash_pkg $chroot_dir/tmp/$_bash_pkg
     echo $(LC_ALL=C LANGUAGE=C LANG=C chroot $chroot_dir /debootstrap/debootstrap --second-stage || true)
