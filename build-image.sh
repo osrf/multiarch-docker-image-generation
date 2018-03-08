@@ -68,7 +68,20 @@ if [[ ${foreign_arches[*]} =~ $arch ]]; then
   elif [ $arch == 'arm64' ]; then
     cp qemu-aarch64-static $chroot_dir/usr/bin/
   fi
-  LC_ALL=C LANGUAGE=C LANG=C chroot $chroot_dir /debootstrap/debootstrap --second-stage
+  # Use a modified bash in arm bionic
+  # Workaround for https://github.com/osrf/multiarch-docker-image-generation/issues/18
+  # This is very hairy because bash's config scripts are all in bash and
+  # dpkg doesn't seem able to override the exist status of a prerm script.
+  if [ $suite == 'bionic' -a $arch == 'arm64' ]; then
+    _bash_pkg="bash_4.4.18-1ubuntu1osrf1_${arch}.deb"
+    cp $_bash_pkg $chroot_dir/tmp/$_bash_pkg
+    echo $(LC_ALL=C LANGUAGE=C LANG=C chroot $chroot_dir /debootstrap/debootstrap --second-stage || true)
+    LC_ALL=C LANGUAGE=C LANG=C chroot $chroot_dir rm /var/lib/dpkg/info/bash.prerm
+    LC_ALL=C LANGUAGE=C LANG=C chroot $chroot_dir dpkg --purge --force-all bash
+    LC_ALL=C LANGUAGE=C LANG=C chroot $chroot_dir dpkg -i /tmp/$_bash_pkg
+  else
+    LC_ALL=C LANGUAGE=C LANG=C chroot $chroot_dir /debootstrap/debootstrap --second-stage
+  fi
   LC_ALL=C LANGUAGE=C LANG=C chroot $chroot_dir dpkg --configure -a
 fi
 if [ $os == 'ubuntu' ]; then
