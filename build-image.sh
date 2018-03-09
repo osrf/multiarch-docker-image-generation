@@ -74,6 +74,9 @@ if [[ ${foreign_arches[*]} =~ $arch ]]; then
   # dpkg doesn't seem able to override the exist status of a prerm script.
   if [ $suite == 'bionic' -a \( $arch == 'arm64' -o $arch == 'armhf' \) ]; then
     _bash_pkg="bash_4.4.18-1ubuntu1osrf1_${arch}.deb"
+    if [ ! -e $_bash_pkg ]; then
+      wget "https://github.com/osrf/multiarch-docker-image-generation/releases/download/bash-4.4.18-1ubuntu1osrf1/$_bash_pkg"
+    fi
     cp $_bash_pkg $chroot_dir/tmp/$_bash_pkg
     echo $(LC_ALL=C LANGUAGE=C LANG=C chroot $chroot_dir /debootstrap/debootstrap --second-stage || true)
     LC_ALL=C LANGUAGE=C LANG=C chroot $chroot_dir rm /var/lib/dpkg/info/bash.prerm
