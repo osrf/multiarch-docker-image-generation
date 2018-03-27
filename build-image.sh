@@ -90,13 +90,22 @@ fi
 if [ $os == 'ubuntu' ]; then
   repositories='main restricted universe multiverse'
 else
-  repositories='main non-free contrib'
+  repositories='main'
+  additional_components='non-free contrib'
 fi
 
 ### update the list of package sources
 cat <<EOF > $chroot_dir/etc/apt/sources.list
 deb $apt_mirror $suite $repositories
 EOF
+
+if [ -n "$additional_components" ]; then
+	for component in $additional_components; do
+		cat <<EOF >> $chroot_dir/etc/apt/sources.list
+deb $apt_mirror $suite $component
+EOF
+	done
+fi
 
 if [ $os == 'ubuntu' ]; then
   cat <<EOF >> $chroot_dir/etc/apt/sources.list
