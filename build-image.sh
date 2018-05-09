@@ -120,6 +120,13 @@ chmod +x $chroot_dir/usr/sbin/policy-rc.d
 # force dpkg not to call sync() after package extraction (speeding up installs)
 echo 'force-unsafe-io' > $chroot_dir/etc/dpkg/dpkg.cfg.d/docker-apt-speedup
 
+# Install humanity-icon-theme on bionic to work around
+# https://github.com/ros-infrastructure/buildfarm_deployment/issues/198
+if [ $suite == 'bionic' ]; then
+	chroot $chroot_dir sh -c 'apt-get update && apt-get install -y humanity-icon-theme'
+fi
+
+
 # _keep_ us lean by effectively running "apt-get clean" after every install
 echo 'DPkg::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin || true"; };' > $chroot_dir/etc/apt/apt.conf.d/docker-clean
 echo 'APT::Update::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin || true"; };' >> $chroot_dir/etc/apt/apt.conf.d/docker-clean
