@@ -7,6 +7,7 @@ In order to run docker images derived from a different platform architecture tha
 `$ sudo apt install qemu-user-static`
 
 Additionally, the runtime in the container will need access to qemu-<arch>-static binaries. This can be done two ways; by either mounting those binaries from the host to `user/bin/` inside the container, or baking them into the image itself from the get-go (as done here in this repo's bootstrap setup).
+To see what version of qemu is currently being bundled, check the commit history. Updates to the embedded binaries should include their full version and how they were sourced.
 
 In order to use the bootstrap tooling, `debootstrap` must be installed. This can be done by simply via: 
 `$ sudo apt install debootstrap`
