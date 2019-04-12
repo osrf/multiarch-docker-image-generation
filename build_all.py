@@ -22,13 +22,12 @@ arch_uname_mapping = {
 
 SUPPORTED_TARGETS = {
     'debian': {
-        'jessie': ['arm64', 'armhf'],
         'stretch': ['arm64', 'armhf'],
+        'buster': ['arm64', 'armhf'],
     },
     'ubuntu': {
         'trusty': ['i386', 'armhf'],
         'xenial': ALL_ARCHES,
-        'artful': ['i386'],
         'bionic': ALL_ARCHES,
     }
 }
