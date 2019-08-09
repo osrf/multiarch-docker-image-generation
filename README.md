@@ -1,6 +1,6 @@
 Script (derived from https://github.com/docker-32bit/ubuntu) to generate Ubuntu 32bit Docker images.
 
-The generated Docker images are available via [DockerHub](https://registry.hub.docker.com/u/osrf/ubuntu_32bit/).
+The generated Docker images are available via [DockerHub](https://hub.docker.com/r/osrf/ubuntu_i386/).
 
 #### Note:
 In order to run docker images derived from a different platform architecture than the host (the architecture used to run the docker engine), the host kernel still needs to be configured to enable the binfmt-support for the foreign architecture. This can be done by simply via:  
