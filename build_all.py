@@ -30,6 +30,7 @@ SUPPORTED_TARGETS = {
         'xenial': ALL_ARCHES,
         'artful': ['i386'],
         'bionic': ALL_ARCHES,
+        'disco' : ALL_ARCHES,
     }
 }
 
