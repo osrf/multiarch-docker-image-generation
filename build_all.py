@@ -29,6 +29,7 @@ SUPPORTED_TARGETS = {
         'trusty': ['i386', 'armhf'],
         'xenial': ALL_ARCHES,
         'bionic': ALL_ARCHES,
+        'disco' : ALL_ARCHES,
     }
 }
 
