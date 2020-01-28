@@ -30,7 +30,7 @@ SUPPORTED_TARGETS = {
         'xenial': ALL_ARCHES,
         'bionic': ALL_ARCHES,
         'disco' : ALL_ARCHES,
-        'focal' : ALL_ARCHES,
+        'focal' : ['arm64', 'armhf'],
     }
 }
 
