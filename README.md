@@ -9,8 +9,8 @@ In order to run docker images derived from a different platform architecture tha
 Additionally, the runtime in the container will need access to qemu-<arch>-static binaries. This can be done two ways; by either mounting those binaries from the host to `user/bin/` inside the container, or baking them into the image itself from the get-go (as done here in this repo's bootstrap setup).
 The current version of qemu being bundled is 3.1.
 
-* `qemu-aarch64-static` was taken from the Debian package `qemu-user-static_3.1+dfsg-8+deb10u3_amd64.deb`.
-* `qemu-arm-static` was taken from the Debian package `qemu-user-static_3.1+dfsg-8+deb10u3_i386.deb`.
+* `qemu-aarch64-static` was taken from the Debian package `qemu-user-static_4.2-3_amd64.deb`.
+* `qemu-arm-static` was taken from the Debian package `qemu-user-static_4.2-3_i386.deb`.
 
 The binary `qemu-arm-static` must be taken from a 32bit architecture (in this case i386) to work around [this bug](https://bugs.launchpad.net/qemu/+bug/1805913).
 
