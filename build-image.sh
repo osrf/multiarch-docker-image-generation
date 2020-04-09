@@ -153,6 +153,12 @@ fi
 chroot $chroot_dir dpkg-divert --local --rename --add /sbin/initctl
 chroot $chroot_dir ln -sf /bin/true /sbin/initctl
 
+### Build semop wrapper
+cp wrap_semop.c $chroot_dir/tmp/
+chroot $chroot_dir apt-get -y install build-essential
+chroot $chroot_dir gcc -fPIC -shared -o /opt/libpreload-semop.so /tmp/wrap_semop.c
+chroot $chroot_dir printf /opt/libpreload-semop.so > $chroot_dir/etc/ld.so.preload
+
 ### cleanup and unmount /proc
 chroot $chroot_dir apt-get autoclean
 chroot $chroot_dir apt-get clean
