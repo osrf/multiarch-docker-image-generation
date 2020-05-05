@@ -159,6 +159,12 @@ chroot $chroot_dir apt-get -y install build-essential
 chroot $chroot_dir gcc -fPIC -shared -o /opt/libpreload-semop.so /tmp/wrap_semop.c
 chroot $chroot_dir echo /opt/libpreload-semop.so > $chroot_dir/etc/ld.so.preload
 
+### Build *time64 wrapper
+cp wrap_time64.c $chroot_dir/tmp/
+chroot $chroot_dir apt-get -y install build-essential
+chroot $chroot_dir gcc -fPIC -shared -o /opt/libpreload-time64.so /tmp/wrap_time64.c
+chroot $chroot_dir echo /opt/libpreload-time64.so >> $chroot_dir/etc/ld.so.preload
+
 ### cleanup and unmount /proc
 chroot $chroot_dir apt-get autoclean
 chroot $chroot_dir apt-get clean
