@@ -21,8 +21,9 @@ Additionally when building from a different platform architecture than the targe
 
 ### Building minimal images using the upstream multiarch images as a base.
 
-Docker's native multi-arch image support is available in 20.04.
-Until our infrastructure is configured to specify platforms when building and running cross-platform images we still rely on the osrf/$OS_$ARCH:$CODENAME images with the appropriate qemu binary being present.
+Docker's native multi-arch image support is available in 20.04 which includes support for using the host's qemu-user-static and binfmt-misc support to run arm-native images on amd64 transparently.
+See https://github.com/docker/for-linux/issues/56 and https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=868217
+Until our infrastructure is configured to specify platform when building and running cross-platform images we still rely on the osrf/$OS_$ARCH:$CODENAME images.
 
 However, instead of building and maintaining images from scratch we can leverage the default docker images for debian and ubuntu which are now provided for multiple platforms.
 Since the native arch information is embedded in the image's metadata a normal docker-run will generate warnings when the platform doesn't match the host platform.
@@ -31,20 +32,16 @@ I haven't found a more ergonomic way of doing this yet.
 
 The process is as follows
 
-1. Create a minimal dockerfile which overlays the appropriate qemu-user-static binary onto the base image.
+1. Fetch the appropriate base image from Docker Hub
   ```
-  bash gendockerfile.bash ARCH=arm64 OS=ubuntu CODENAME=jammy QEMU_STATIC_BIN=qemu-aarch64-static
+  docker pull --platform=linux/amd64 ubuntu:jammy
   ```
-2. Build the image using a platform-aware builder
+2. Using the image ID rather than tag (to prevent overriding the official tag and confusing your system later) export the image as a tar archive and extract it to a temporary workspace
   ```
-  docker buildx build -f ubuntu-jammy-arm64.dockerfile -t osrf/ubuntu_arm64:jammy --no-cache
-  ```
-3. Export the image as a tar archive and extract it to a temporary workspace
-  ```
-  docker save osrf/ubuntu_arm64:jammy > ubuntu-jammy-arm64.tar
+  docker save 0da0201282b7 > ubuntu-jammy-arm64.tar
   mkdir -p tmp/ubuntu-jammy-arm64; tar -C tmp/ubuntu-jammy-arm64 -xf ubuntu-jammy-arm64.tar
   ```
-4. Edit the image metadata to set the architecture to amd64. "variant" is not defined by default for amd64 images.
+3. Edit the image metadata to set the architecture to amd64. "variant" is not defined by default for amd64 images.
   ```
   sed -e 's/"architecture":"arm64"/"architecture":"amd64"/' -e 's/,"variant":"v8"//' -i tmp/ubuntu-jammy-arm64/*.json
   ```
@@ -53,7 +50,8 @@ The process is as follows
   tar -C tmp/ubuntu-jammy-arm64 -cf ubuntu-jammy-arm64.tar .
   docker load < ubuntu-jammy-arm64.tar
   ```
-6. Push the image to Docker Hub
+6. Tag and push the image to Docker Hub
   ```
+  docker tag 184ec6725d6517ab94e8ee552f357f787eff4dc8ef1e41c8c2de8ab5d606b19c osrf/ubuntu_arm64:jammy
   docker push osrf/ubuntu_arm64:jammy
   ```
